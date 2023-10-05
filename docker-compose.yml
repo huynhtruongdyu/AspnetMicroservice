@@ -1,0 +1,27 @@
+version: '3.4'
+
+networks:
+  internal_network:
+    driver: bridge
+
+services:
+  nosql:
+    image: mongo:latest
+    # volumes:
+    #   - "./config/mongod.conf:/data/configdb/mongod.conf:ro"
+    #   - "./data:/data/db"
+    #   - "log:/var/log/mongodb"
+    # command: ["/usr/bin/mongod", "-f", "/data/configdb/mongod.conf"]
+    restart: always
+    networks:
+      - internal_network
+
+  catalog.api:
+    image: ${DOCKER_REGISTRY-}catalogapi
+    build:
+      context: .
+      dockerfile: src/Services/Catalog/Catalog.API/Dockerfile
+    depends_on:
+      - nosql
+    networks:
+      - internal_network
